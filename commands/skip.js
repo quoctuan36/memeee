@@ -1,9 +1,10 @@
 const { ApplicationCommandOptionType, EmbedBuilder } = require('discord.js')
+const { deleteMessage } = require('../Functions')
 
 module.exports = {
    name: 'skip',
-   description: 'Skip current song',
-   permissions: '0x0000000000000800',
+   description: 'Skip song',
+   voiceChannel: true,
    options: [
       {
          name: 'number',
@@ -12,66 +13,38 @@ module.exports = {
          required: false,
       },
    ],
-   voiceChannel: true,
 
    run: async (client, interaction) => {
       try {
+         await interaction.deferReply()
+         const number = interaction.options.getNumber('number')
          const queue = client.player.getQueue(interaction.guild.id)
-         if (!queue || !queue.playing)
-            return interaction.reply({ content: 'No music playing', ephemeral: true }).catch((e) => {})
+         const embed = new EmbedBuilder().setColor(client.config.player.embedColor)
 
-         let number = interaction.options.getNumber('number')
-         if (number) {
-            if (!queue.songs.length > number)
-               return interaction.reply({ content: 'Exceeded current no of songs', ephemeral: true }).catch((e) => {})
-            if (isNaN(number)) return interaction.reply({ content: 'Invalid Number', ephemeral: true }).catch((e) => {})
-            if (1 > number) return interaction.reply({ content: 'Invalid Number', ephemeral: true }).catch((e) => {})
+         if (!queue || !queue.playing) {
+            embed.setDescription('No music is currently playing')
+         } else if (number) {
+            if (number > queue.songs.length) embed.setDescription('Exceeded current no of songs')
+            if (isNaN(number) || number < 1) embed.setDescription('Invalid Number')
 
             try {
                await client.player.jump(interaction, number)
-               const embed = new EmbedBuilder()
-                  .setColor(client.config.embedColor)
-                  .setDescription(success ? `Skipped` : '❌ Queue is empty')
-
-               const msg = await interaction.reply({ embeds: [embed] }).catch((e) => {})
-
-               setTimeout(async () => {
-                  if (msg) {
-                     await msg.delete().catch((e) => {})
-                  }
-               }, 5000)
-            } catch (e) {
-               return interaction.reply({ content: '❌ Queue is empty', ephemeral: true }).catch((e) => {})
+               embed.setDescription(`Skipped ${number} songs`)
+            } catch {
+               embed.setDescription('No songs to skip')
             }
          } else {
             try {
-               const queue = client.player.getQueue(interaction.guild.id)
-               if (!queue || !queue.playing) {
-                  return interaction.reply({ content: 'No music playing', ephemeral: true })
-               }
-
-               let old = queue.songs[0]
-               const success = await queue.skip()
-
-               const embed = new EmbedBuilder()
-                  .setColor(client.config.embedColor)
-                  .setDescription(success ? `Skipped [${old.name}](${old.url})` : '❌ Queue is empty')
-
-               const msg = await interaction.reply({ embeds: [embed] }).catch((e) => {})
-
-               setTimeout(async () => {
-                  if (msg) {
-                     await msg.delete().catch((e) => {})
-                  }
-               }, 5000)
-            } catch (e) {
-               return interaction.reply({ content: '❌ Queue is empty', ephemeral: true }).catch((e) => {
-                  console.log(e)
-               })
+               embed.setDescription(`Skipped [${queue.songs[0].name}](${queue.songs[0].url})`)
+               await queue.skip()
+            } catch {
+               embed.setDescription('No song to skip')
             }
          }
-      } catch (e) {
-         console.error(e)
+
+         deleteMessage(await interaction.editReply({ embeds: [embed] }), 10000)
+      } catch {
+         console.log('❌    Skip Error')
       }
-   },
+   }
 }

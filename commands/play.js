@@ -1,9 +1,9 @@
 const { ApplicationCommandOptionType, EmbedBuilder } = require('discord.js')
+const { playMusic, deleteMessage, strict } = require('../Functions')
 
 module.exports = {
    name: 'play',
    description: 'Play music',
-   permissions: '0x0000000000000800',
    voiceChannel: true,
    options: [
       {
@@ -15,35 +15,24 @@ module.exports = {
    ],
 
    run: async (client, interaction) => {
+      strict(interaction)
+      
       try {
+         await interaction.deferReply()
          const name = interaction.options.getString('name')
-         if (!name) {
-            return interaction.reply({ content: 'Type music name or link', ephemeral: true }).catch(() => {})
-         }
-
-         const embed = new EmbedBuilder().setColor(client.config.embedColor).setAuthor({
-            name: 'Meowing',
-            iconURL: interaction.guild.iconURL(),
-         })
-
-         const msg = await interaction.reply({ embeds: [embed] }).catch(() => {})
+         const embed = new EmbedBuilder().setColor(client.config.player.embedColor).setDescription('Meowing')
+         const msg = await interaction.editReply({ embeds: [embed] })
 
          try {
-            await client.player.play(interaction.member.voice.channel, name, {
-               member: interaction.member,
-               textChannel: interaction.channel,
-               interaction,
-            })
+            await playMusic(client, interaction, name)
+            deleteMessage(msg, 1000)
          } catch {
-            embed.setDescription('❌  No results found')
-            await interaction.editReply({ embeds: [embed] }).catch(() => {})
+            embed.setDescription('Not found')
+            await interaction.editReply({ embeds: [embed] })
+            deleteMessage(msg, 5000)
          }
-
-         setTimeout(async () => {
-            if (msg) {
-               await msg.delete().catch(() => {})
-            }
-         }, 2000)
-      } catch {}
-   },
+      } catch {
+         console.log('❌    Play Error')
+      }
+   }
 }
