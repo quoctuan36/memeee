@@ -1,7 +1,7 @@
 # MeowBot - Discord Bot
 <img src="./Assets/Preview.png" alt="Preview" width="830">
 
-## Prerequisites
+## Prerequisites 
 
 Before you begin, make sure you have the following installed:
 
