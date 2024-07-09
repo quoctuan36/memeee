@@ -1,5 +1,5 @@
 # MeowBot - Discord Bot
-<img src="./Assets/preview.png" alt="Preview" width="830">
+<img src="./Assets/Preview.png" alt="Preview" width="830">
 
 ## Prerequisites
 
