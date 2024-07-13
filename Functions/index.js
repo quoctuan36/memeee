@@ -1,14 +1,17 @@
 const { ActionRowBuilder, ButtonBuilder, EmbedBuilder, ModalBuilder, TextInputBuilder } = require('discord.js')
 const { DisTubeHandler, Playlist } = require('distube')
+// const axios = require('axios')
 const fs = require('fs').promises
 
 // #region Function
 module.exports = {
+   isStrict,
    strict,
    auth,
    reject,
    handleCommand,
    handleModalSubmit,
+   songSuggestion,
    playMusic,
    description,
    getSeconds,
@@ -17,6 +20,7 @@ module.exports = {
    capFirstChar,
    formatTime,
    updateEmbed,
+   refreshEmbed,
    generateQueuePage,
    queueActionRow,
    showModal,
@@ -27,9 +31,11 @@ module.exports = {
    sleep,
 }
 
+function isStrict(interaction) {
+   return interaction.user.id !== '677857271530651649'
+}
 async function strict(interaction) {
-   if(interaction.user.id !== '677857271530651649')
-      return deleteMessage(await interaction.reply({content: 'Im Sleeping :3'}), 10000)
+   return deleteMessage(await interaction.reply({ content: 'Im Sleeping :3' }), 10000)
 }
 // #region Auth
 function auth(client, interaction) {
@@ -42,27 +48,18 @@ function auth(client, interaction) {
    }
 }
 async function reject(interaction) {
-   await interaction.reply({ content: `I'm sleeping, Call <@677857271530651649> Please ❤️‍🔥`, ephemeral: true })
+   await interaction.reply({ content: `I'm sleeping <@${interaction.user.id}>, Call <@677857271530651649> Please ❤️‍🔥` })
 }
 // #region interactionCreate
 async function handleCommand(client, interaction) {
    try {
       if (!interaction.isCommand()) return
-
       const command = client.commands.get(interaction.commandName)
+      if (!command) return await interaction.reply({ content: 'Command not found', ephemeral: true })
+      if (!auth(client, interaction)) return reject(interaction)
+      if (command.voiceChannel && !interaction.member.voice.channelId)
+         return deleteMessage(await interaction.reply({ content: 'Join Voice Channel' }), 10000)
 
-      if (!command) {
-         await interaction.reply({ content: 'Command not found', ephemeral: true })
-         return
-      }
-      if (!auth(client, interaction)) {
-         reject(interaction)
-         return
-      }
-      if (command.voiceChannel && !interaction.member.voice.channelId) {
-         deleteMessage(await interaction.reply({ content: 'Join Voice Channel' }), 10000)
-         return
-      }
       await command.run(client, interaction)
    } catch (e) {
       console.error('❌ Command Load Error\n', e)
@@ -151,6 +148,19 @@ async function playMusic(client, interaction, name) {
    }
 }
 // #region playSong
+async function songSuggestion(client, query) {
+   // const response = await axios.get('https://www.googleapis.com/youtube/v3/search', {
+   //    params: {
+   //       part: 'snippet',
+   //       maxResults: 10,
+   //       q: query,
+   //       type: 'video',
+   //       videoCategoryId: '10',
+   //       key: client.config.YTAPI,
+   //    },
+   // })
+   // return response.data.items.map((item) => item.snippet.title)
+}
 async function playSong(client, interaction, name) {
    await client.player
       .play(interaction.member.voice.channel, name, {
@@ -191,7 +201,7 @@ function description(queue) {
    )
 }
 function hasFilter(queue, filter) {
-   return queue.filters.has(filter) ? '🟢' : '❌'
+   return queue.filters.has(filter) ? '✅' : '❌'
 }
 
 // #region Seek
@@ -244,8 +254,13 @@ function formatTime(duration) {
    }
 }
 // #region updateEmbed
-async function updateEmbed(interaction, currentMsg, embed) {
-   await Promise.all([currentMsg.edit({ embeds: [embed.setTimestamp()] }), interaction.deferUpdate()]).catch(() => {})
+async function updateEmbed(interaction, queue) {
+   await Promise.all([queue.playerMessage.edit({ embeds: [queue.playerEmbed.setTimestamp()] }), interaction.deferUpdate()]).catch(() => {})
+}
+async function refreshEmbed(queue) {
+   try {
+      await queue.playerMessage.edit({ embeds: [queue.playerEmbed.setTimestamp()] })
+   } catch { }
 }
 
 // #region Queue
@@ -348,5 +363,17 @@ async function sleep(ms) {
 }
 
 function printData(data) {
+   console.log('---------------------------------------------')
    console.log(data)
+   console.log('---------------------------------------------')
 }
+
+
+
+
+
+
+
+
+
+// ─────・ F R O M  R Y O K R  W I T H  L U V ❤️‍🔥・───── //

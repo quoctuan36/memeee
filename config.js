@@ -1,7 +1,8 @@
 require('dotenv').config()
 
 module.exports = {
-   TOKEN: process.env.token,
+   TOKEN: process.env.token || 'Meow',
+   YTAPI: process.env.ytapi || 'Meow',
 
    presence: {
       status: process.env.status || 'idle',
@@ -25,3 +26,13 @@ module.exports = {
    leave: Boolean(process.env.leave) || false,
    shard: Boolean(process.env.shard) || false,
 }
+
+
+
+
+
+
+
+
+
+// ─────・ F R O M  R Y O K R  W I T H  L U V ❤️‍🔥・───── //

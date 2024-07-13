@@ -5,7 +5,7 @@ module.exports = {
    name: 'stop',
    description: 'Stop the music and clear the queue',
    voiceChannel: true,
-   
+
    run: async (client, interaction) => {
       try {
          await interaction.deferReply()
@@ -15,9 +15,7 @@ module.exports = {
          if (!queue || !queue.playing) {
             embed.setDescription('No music is currently playing')
          } else {
-            if (queue.lastPlayingMessage != null) {
-               await queue.lastPlayingMessage.delete().catch(() => {})
-            }
+            if (queue.playerMessage) await queue.playerMessage.delete().catch(() => {})
             await queue.stop()
             embed.setDescription('Stopped the music and cleared the queue')
          }
@@ -28,3 +26,13 @@ module.exports = {
       }
    }
 }
+
+
+
+
+
+
+
+
+
+// ─────・ F R O M  R Y O K R  W I T H  L U V ❤️‍🔥・───── //

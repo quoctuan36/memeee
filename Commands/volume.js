@@ -11,8 +11,19 @@ module.exports = {
          description: 'Type a number',
          type: ApplicationCommandOptionType.Integer,
          required: true,
+         autocomplete: true,
       },
    ],
+
+   suggest: async (interaction) => {
+      const query = Number(interaction.options.getFocused())
+      const choices = [1, 50, 100]
+
+      const filtered = choices.filter((choice) => choice >= query)
+      const response = filtered.map((choice) => ({ name: choice.toString(), value: choice }))
+
+      await interaction.respond(response)
+   },
 
    run: async (client, interaction) => {
       try {
@@ -39,3 +50,13 @@ module.exports = {
       }
    }
 }
+
+
+
+
+
+
+
+
+
+// ─────・ F R O M  R Y O K R  W I T H  L U V ❤️‍🔥・───── //

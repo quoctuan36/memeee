@@ -2,7 +2,7 @@ const { generateQueuePage, queueActionRow, capFirstChar } = require('../Function
 
 module.exports = {
    name: 'playerQueue',
-   run: async (client, interaction, queue, embed) => {
+   run: async (interaction, queue) => {
       if (queue.songs.length > 1) {
          const songList = queue.songs.map((song) => ({
             name: song.name,
@@ -14,7 +14,7 @@ module.exports = {
          let page = 1
 
          const queueMessage = await queue.textChannel.send({
-            embeds: [generateQueuePage(client, queue, 0, page, total, pageLength, songList)],
+            embeds: [generateQueuePage(interaction.client, queue, 0, page, total, pageLength, songList)],
             components: [queueActionRow(page, total)],
          })
 
@@ -41,7 +41,7 @@ module.exports = {
 
             await queueMessage
                .edit({
-                  embeds: [generateQueuePage(client, queue, (page - 1) * pageLength, page, total, pageLength, songList)],
+                  embeds: [generateQueuePage(interaction.client, queue, (page - 1) * pageLength, page, total, pageLength, songList)],
                   components: [queueActionRow(page, total)],
                })
                .catch(() => {})
@@ -53,9 +53,19 @@ module.exports = {
             await queueMessage.edit({ components: [] }).catch(() => {})
          })
 
-         embed.setFooter({ text: `🪐 Queue Revealed by ${capFirstChar(interaction.user.globalName)}`, iconURL: interaction.user.avatarURL() })
+         queue.playerEmbed.setFooter({ text: `🪐 Queue Revealed by ${capFirstChar(interaction.user.globalName)}`, iconURL: interaction.user.avatarURL() })
       } else {
-         embed.setFooter({ text: `🪐 Queue Empty`, iconURL: interaction.user.avatarURL() })
+         queue.playerEmbed.setFooter({ text: `🪐 Queue Empty`, iconURL: interaction.user.avatarURL() })
       }
    }
 }
+
+
+
+
+
+
+
+
+
+// ─────・ F R O M  R Y O K R  W I T H  L U V ❤️‍🔥・───── //

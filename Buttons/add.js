@@ -2,7 +2,17 @@ const { showModal } = require('../Functions')
 
 module.exports = {
    name: 'playerAdd',
-   run: async (client, interaction) => {
+   run: async (interaction) => {
       await showModal(interaction, 'playerAddModal', 'Add Music', 'playerAddInput', 'Name', 'Enter music name')
    }
 }
+
+
+
+
+
+
+
+
+
+// ─────・ F R O M  R Y O K R  W I T H  L U V ❤️‍🔥・───── //

@@ -1,8 +1,18 @@
 module.exports = {
    name: 'playerPrev',
-   run: async (client, interaction, queue, embed) => {
+   run: async (interaction, queue) => {
       await queue.previous().catch(() => {
-         embed.setFooter({ text: `🌵 No song`, iconURL: interaction.user.avatarURL() })
+         queue.playerEmbed.setFooter({ text: `🌵 No song`, iconURL: interaction.user.avatarURL() })
       })
    }
 }
+
+
+
+
+
+
+
+
+
+// ─────・ F R O M  R Y O K R  W I T H  L U V ❤️‍🔥・───── //

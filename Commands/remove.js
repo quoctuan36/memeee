@@ -10,14 +10,25 @@ module.exports = {
          name: 'position',
          description: 'The position of the song, press Queue button for information',
          type: ApplicationCommandOptionType.Integer,
-         required: true,
+         required: false,
+         autocomplete: true,
       },
    ],
+
+   suggest: async (interaction) => {
+      const query = Number(interaction.options.getFocused())
+      const choices = [1, 10, 20]
+
+      const filtered = choices.filter((choice) => choice >= query)
+      const response = filtered.map((choice) => ({ name: choice.toString(), value: choice }))
+
+      await interaction.respond(response)
+   },
 
    run: async (client, interaction) => {
       try {
          await interaction.deferReply()
-         const position = interaction.options.getInteger('position')
+         const position = interaction.options.getInteger('position') || 1
          const queue = client.player.getQueue(interaction.guild.id)
          const embed = new EmbedBuilder().setColor(client.config.player.embedColor).setDescription('Meowing')
 
@@ -28,7 +39,7 @@ module.exports = {
             embed.setDescription('Removed')
             try {
                await queue.stop()
-               await client.playerMessage.delete().catch(() => {})
+               await queue.playerMessage.delete().catch(() => {})
             } catch {}
             deleteMessage(await interaction.editReply({ embeds: [embed] }), 5000)
          } else if (position < 1 || position > queue.songs.length) {
@@ -39,7 +50,7 @@ module.exports = {
             embed
                .setThumbnail(removedSong.thumbnail)
                .setDescription(`Removed [${removedSong.name}](${removedSong.url})・Requested by <@${removedSong.user.id}>`)
-               
+
             await interaction.editReply({ embeds: [embed] })
          }
       } catch {
@@ -47,3 +58,13 @@ module.exports = {
       }
    }
 }
+
+
+
+
+
+
+
+
+
+// ─────・ F R O M  R Y O K R  W I T H  L U V ❤️‍🔥・───── //

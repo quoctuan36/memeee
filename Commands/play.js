@@ -1,5 +1,5 @@
 const { ApplicationCommandOptionType, EmbedBuilder } = require('discord.js')
-const { playMusic, deleteMessage } = require('../Functions')
+const { playMusic, deleteMessage, songSuggestion } = require('../Functions')
 
 module.exports = {
    name: 'play',
@@ -11,8 +11,16 @@ module.exports = {
          description: 'Type music name or link',
          type: ApplicationCommandOptionType.String,
          required: true,
+         //autocomplete: true,
       },
    ],
+
+   // suggest: async (interaction) => {
+   //    const query = interaction.options.getFocused().toLowerCase()
+   //    const song = await songSuggestion(interaction.client, query)
+   //    const data = song.map((song) => ({ name: song, value: song }))
+   //    await interaction.respond(data)
+   // },
 
    run: async (client, interaction) => {
       try {
@@ -34,3 +42,13 @@ module.exports = {
       }
    }
 }
+
+
+
+
+
+
+
+
+
+// ─────・ F R O M  R Y O K R  W I T H  L U V ❤️‍🔥・───── //

@@ -2,11 +2,21 @@ const { capFirstChar } = require('../Functions')
 
 module.exports = {
    name: 'playerShuf',
-   run: async (client, interaction, queue, embed) => {
+   run: async (interaction, queue) => {
       await queue.shuffle()
-      embed.setFooter({
+      queue.playerEmbed.setFooter({
          text: `🌱 Shuffled by ${capFirstChar(interaction.user.globalName)}`,
          iconURL: interaction.user.avatarURL(),
       })
    }
 }
+
+
+
+
+
+
+
+
+
+// ─────・ F R O M  R Y O K R  W I T H  L U V ❤️‍🔥・───── //

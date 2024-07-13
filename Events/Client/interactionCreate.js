@@ -9,6 +9,8 @@ module.exports = async (client, interaction) => {
 
       if (interaction.type === InteractionType.ApplicationCommand) {
          await handleCommand(client, interaction)
+      } else if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
+         await client.commands.get(interaction.commandName).suggest(interaction)
       } else if (interaction.type === InteractionType.ModalSubmit) {
          await handleModalSubmit(client, interaction)
       }
@@ -16,3 +18,13 @@ module.exports = async (client, interaction) => {
       console.error('❌    Interaction Erorr\n', e)
    }
 }
+
+
+
+
+
+
+
+
+
+// ─────・ F R O M  R Y O K R  W I T H  L U V ❤️‍🔥・───── //

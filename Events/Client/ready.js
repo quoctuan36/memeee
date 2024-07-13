@@ -16,3 +16,13 @@ module.exports = async (client) => {
    process.env.YTDL_NO_UPDATE = true
    process.env.YTSR_NO_UPDATE = true
 }
+
+
+
+
+
+
+
+
+
+// ─────・ F R O M  R Y O K R  W I T H  L U V ❤️‍🔥・───── //

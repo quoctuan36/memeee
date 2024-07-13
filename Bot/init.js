@@ -4,7 +4,7 @@ const fs = require('fs').promises
 module.exports = async (client) => {
    await loadCommands(client, __dirname + '/../Commands')
    await loadEvents(client, client, __dirname + '/../Events/Client')
-   await loadEvents(client, client.player, __dirname + '/../Events/Player')
+   await loadEvents(client, client.player, __dirname + '/../Events/Distube')
    await loadButtons(client, __dirname + '/../Buttons')
 }
 
@@ -56,7 +56,7 @@ const loadButtons = async (client, path) => {
       for (const file of files) {
          const button = require(`${path}/${file}`)
 
-         client.buttons.set(button.name, button.run.bind(null, client))
+         client.buttons.set(button.name, button.run)
          cleanCache(path, file)
       }
    } catch (e) {
@@ -69,3 +69,13 @@ const error = (e) => {
    console.log(e)
    process.exit(1)
 }
+
+
+
+
+
+
+
+
+
+// ─────・ F R O M  R Y O K R  W I T H  L U V ❤️‍🔥・───── //
