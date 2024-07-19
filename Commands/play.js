@@ -35,9 +35,12 @@ module.exports = {
       try {
          await interaction.deferReply()
          const name = interaction.options.getString('name')
-         const position = interaction.options.getInteger('position', false) ?? undefined
+         const queue = client.player.getQueue(interaction.guild.id)
          const embed = new EmbedBuilder().setColor(client.config.player.embedColor).setDescription('Meowing')
          const msg = await interaction.editReply({ embeds: [embed] })
+         let position = interaction.options.getInteger('position', false) ?? undefined
+
+         if (queue && queue.songs.length >= 2) position = 1
 
          try {
             await playMusic(client, interaction, name, position)
@@ -47,18 +50,8 @@ module.exports = {
             await interaction.editReply({ embeds: [embed] })
             deleteMessage(msg, 5000)
          }
-      } catch {
-         console.log('❌  ✦ Play Error')
+      } catch (e) {
+         console.log('❌  ✦ Play Error',e)
       }
    }
 }
-
-
-
-
-
-
-
-
-
-// ─────・ F R O M  R Y O K R  W I T H  L U V ❤️‍🔥・───── //
