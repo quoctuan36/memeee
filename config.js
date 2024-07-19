@@ -1,16 +1,7 @@
 require('dotenv').config()
 
 module.exports = {
-   TOKEN: process.env.token || 'Meow',
-   YTAPI: process.env.ytapi || 'Meow',
-
-   presence: {
-      status: process.env.status || 'idle',
-      
-      name: process.env.name || 'Meow Meow',
-      state: process.env.state || 'From Pooba Saga With 💖',
-      type: parseInt(process.env.type) || 0,
-   },
+   token: process.env.token || 'Meow',
 
    player: {
       embedColor: process.env.color || '2F3136',
@@ -20,10 +11,23 @@ module.exports = {
       dj: process.env.dj || '1227608403166367815',
       guildId: process.env.guildId || '677858109145874433',
 
-      maxVol: parseInt(process.env.maxVol) || 200,
+      maxVol: parseInt(process.env.maxVol) || 100,
    },
 
-   leave: Boolean(process.env.leave) || false,
+   presence: {
+      status: process.env.status || 'idle',
+      
+      name: process.env.name || 'Meow Meow',
+      state: process.env.state || 'From Pooba Saga With 💖',
+      type: parseInt(process.env.type) || 0,
+   },
+
+   invite: {
+      inviteStatus: Boolean(process.env.inviteStatus) || false,
+      inviteUrl: process.env.inviteUrl || 'https://discord.com/oauth2/authorize?client_id=1236709052331982978',
+      inviteGuild: process.env.inviteGuild || 'https://discord.gg/fTuGFk9ayG',
+   },
+
    shard: Boolean(process.env.shard) || false,
 }
 

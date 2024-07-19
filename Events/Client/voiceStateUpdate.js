@@ -9,13 +9,14 @@ module.exports = async (client, oldState, newState) => {
          if (oldQueue && newQueue && oldQueue.textChannel === newQueue.textChannel) {
             try {
                newQueue.playerEmbed.setDescription(newQueue.playerEmbed.data.description.replace(/<#\d+>/, `<#${newState.channelId}>`))
+               newQueue.voice.setSelfDeaf(false)
             } catch {}
             
             await refreshEmbed(newQueue)
          }
       }
-   } catch (e) {
-      console.error('❌    VoiceStateUpdate Error\n', e)
+   } catch {
+      console.log('❌  ✦ 🍉 VoiceStateUpdate Error')
    }
 }
 

@@ -7,7 +7,8 @@ module.exports = {
          const songList = queue.songs.map((song) => ({
             name: song.name,
             url: song.url,
-            duration: song.formattedDuration,
+            duration: song.duration,
+            isLive: song.isLive,
          }))
          const pageLength = 10
          const total = Math.ceil(songList.length / pageLength)
@@ -20,6 +21,8 @@ module.exports = {
 
          const collector = queueMessage.createMessageComponentCollector({ time: 60000 })
          collector.on('collect', async (button) => {
+            await button.deferUpdate().catch(() => {})
+            
             switch (button.customId) {
                case 'queueClose':
                   await queueMessage.delete().catch(() => {})
@@ -45,8 +48,6 @@ module.exports = {
                   components: [queueActionRow(page, total)],
                })
                .catch(() => {})
-
-            await button.deferUpdate().catch(() => {})
          })
 
          collector.on('end', async () => {

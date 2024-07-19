@@ -8,7 +8,7 @@ module.exports = {
    options: [
       {
          name: 'position',
-         description: 'The position of the song, press Queue button for information',
+         description: 'The position of the song, press Queue button for information. Default is current song',
          type: ApplicationCommandOptionType.Integer,
          required: false,
          autocomplete: true,
@@ -16,11 +16,11 @@ module.exports = {
    ],
 
    suggest: async (interaction) => {
-      const query = Number(interaction.options.getFocused())
+      const query = interaction.options.getFocused()
       const choices = [1, 10, 20]
 
       const filtered = choices.filter((choice) => choice >= query)
-      const response = filtered.map((choice) => ({ name: choice.toString(), value: choice }))
+      const response = filtered.map((choice) => ({ name: choice, value: choice }))
 
       await interaction.respond(response)
    },
@@ -49,12 +49,12 @@ module.exports = {
             const removedSong = queue.songs.splice(position - 1, 1)[0]
             embed
                .setThumbnail(removedSong.thumbnail)
-               .setDescription(`Removed [${removedSong.name}](${removedSong.url})・Requested by <@${removedSong.user.id}>`)
+               .setDescription(`✦ Removed [${removedSong.name}](${removedSong.url})・Requested by <@${removedSong.user.id}>`)
 
             await interaction.editReply({ embeds: [embed] })
          }
       } catch {
-         console.log('❌    Remove Error')
+         console.log('❌  ✦ Remove Error')
       }
    }
 }

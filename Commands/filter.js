@@ -21,7 +21,7 @@ module.exports = {
          embed
             .setImage(client.config.player.embedImage)
             .setDescription(description(queue))
-            .setAuthor({ name: '─────・ F I L T E R S 🌱・─────', iconURL: interaction.guild.iconURL() })
+            .setAuthor({ name: '✦ ───── ───── ✦  F I L T E R S 🥝 ✦ ───── ───── ✦', iconURL: interaction.guild.iconURL() })
             .setFooter({ text: `🧩 • Requested by ${capFirstChar(interaction.user.globalName)}`, iconURL: interaction.user.avatarURL() })
             .setTimestamp()
 
@@ -38,6 +38,7 @@ module.exports = {
          const collector = message.createMessageComponentCollector({ filter, time: 120000 })
 
          collector.on('collect', async (button) => {
+            await interaction.deferUpdate()
             if (button.customId === 'filterClose' || !['3d', 'haas', 'vaporwave', 'nightcore'].includes(button.customId)) {
                collector.stop()
                return
@@ -48,7 +49,6 @@ module.exports = {
 
             embed.setDescription(description(queue))
 
-            await button.deferUpdate()
             await interaction.editReply({ embeds: [embed], components: [row] })
          })
 
@@ -56,7 +56,7 @@ module.exports = {
             deleteMessage(message, 100)
          })
       } catch {
-         console.error('❌   Filter Error')
+         console.error('❌  ✦ Filter Error')
       }
    }
 }

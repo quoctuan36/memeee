@@ -3,19 +3,23 @@ const { InteractionType } = require('discord.js')
 
 module.exports = async (client, interaction) => {
    try {
-      if (!interaction.guild) {
-         return await interaction.reply({ content: 'Join voice channel in a Server', ephemeral: true })
-      }
+      if (!interaction.guild) return interaction.reply({ content: 'Use command in a server :3' })
 
-      if (interaction.type === InteractionType.ApplicationCommand) {
-         await handleCommand(client, interaction)
-      } else if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
-         await client.commands.get(interaction.commandName).suggest(interaction)
-      } else if (interaction.type === InteractionType.ModalSubmit) {
-         await handleModalSubmit(client, interaction)
+      switch (interaction.type) {
+         case InteractionType.ApplicationCommand:
+            await handleCommand(client, interaction)
+            break
+
+         case InteractionType.ApplicationCommandAutocomplete:
+            await client.commands.get(interaction.commandName).suggest(interaction)
+            break
+
+         case InteractionType.ModalSubmit:
+            await handleModalSubmit(client, interaction)
+            break
       }
    } catch (e) {
-      console.error('❌    Interaction Erorr\n', e)
+      console.log('❌  ✦ 🍉 Interaction Error\n', e)
    }
 }
 

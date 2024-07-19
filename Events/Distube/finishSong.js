@@ -1,5 +1,10 @@
 module.exports = async (client, queue) => {
-   if (queue.playerMessage) await queue.playerMessage.delete().catch(() => {})
+   try {
+      if (queue.listener) await queue.listener.stop()
+      if (queue.playerMessage) await queue.playerMessage.delete().catch(() => {})
+   } catch {
+      console.log('❌  ✦ 🥝 FinishSong Error')
+   }
 }
 
 

@@ -1,34 +1,25 @@
 const { ActionRowBuilder, ButtonBuilder, EmbedBuilder, ModalBuilder, TextInputBuilder } = require('discord.js')
-const { DisTubeHandler, Playlist } = require('distube')
-// const axios = require('axios')
-const fs = require('fs').promises
+const { Playlist } = require('distube')
 
 // #region Function
 module.exports = {
-   isStrict,
-   strict,
    auth,
    reject,
    handleCommand,
    handleModalSubmit,
-   songSuggestion,
+   getAddEmbed,
    playMusic,
    description,
    getSeconds,
-   getMiliSeconds,
    deleteMessage,
    capFirstChar,
    formatTime,
    updateEmbed,
    refreshEmbed,
+   updateButtons,
    generateQueuePage,
    queueActionRow,
    showModal,
-   printData,
-   createGuild,
-   leaveGuild,
-   listGuilds,
-   sleep,
 }
 
 function isStrict(interaction) {
@@ -62,7 +53,7 @@ async function handleCommand(client, interaction) {
 
       await command.run(client, interaction)
    } catch (e) {
-      console.error('❌ Command Load Error\n', e)
+      console.error('❌  ✦ 🍕 Command Load Error\n', e)
       await interaction.reply({ content: 'Failed to load command', ephemeral: true })
    }
 }
@@ -71,16 +62,16 @@ async function handleModalSubmit(client, interaction) {
    const embed = new EmbedBuilder().setColor(client.config.player.embedColor)
 
    if (interaction.customId === 'playerAddModal') {
-      await handleAddModal(client, interaction, embed)
+      await addModal(client, interaction, embed)
    } else if (interaction.customId === 'playerSeekModal') {
-      await handleSeekModal(interaction, queue, embed)
+      await seekModal(interaction, queue, embed)
    } else if (interaction.customId === 'playerVolumeModal') {
-      await handleVolumeModal(client, interaction, queue, embed)
+      await volumeModal(client, interaction, queue, embed)
    }
 }
 // #region Add Modal
-async function handleAddModal(client, interaction, embed) {
-   const songName = interaction.fields.getTextInputValue('playerAddInput')
+async function addModal(client, interaction, embed) {
+   const query = interaction.fields.getTextInputValue('playerAddInput')
 
    if (!interaction.member.voice.channel) {
       embed.setDescription('Join voice channel')
@@ -89,12 +80,12 @@ async function handleAddModal(client, interaction, embed) {
       embed.setDescription('Meowing')
       const msg = await interaction.reply({ embeds: [embed] })
 
-      await playMusic(client, interaction, songName)
-      deleteMessage(msg, 1000)
+      await playMusic(client, interaction, query, 1)
+      deleteMessage(msg, 3000)
    }
 }
 // #region Seek Modal
-async function handleSeekModal(interaction, queue, embed) {
+async function seekModal(interaction, queue, embed) {
    const value = interaction.fields.getTextInputValue('playerSeekInput')
    const position = getSeconds(value)
 
@@ -110,7 +101,7 @@ async function handleSeekModal(interaction, queue, embed) {
    deleteMessage(await interaction.reply({ embeds: [embed] }), 5000)
 }
 // #region Volume Modal
-async function handleVolumeModal(client, interaction, queue, embed) {
+async function volumeModal(client, interaction, queue, embed) {
    const maxVol = client.config.player.maxVol
    const vol = parseInt(interaction.fields.getTextInputValue('playerVolumeInput'))
 
@@ -128,68 +119,66 @@ async function handleVolumeModal(client, interaction, queue, embed) {
    deleteMessage(await interaction.reply({ embeds: [embed] }), 10000)
 }
 
+// #region addEmbeb
+function getAddEmbed(client, song) {
+   return new EmbedBuilder()
+      .setColor(client.config.player.embedColor)
+      .setThumbnail(song.thumbnail)
+      .setDescription(`✦ Added [${song.name}](${song.url})・Requested by <@${song.user.id}>\n✦ From ${capFirstChar(song.source)}`)
+}
+
 // #region playMusic
-async function playMusic(client, interaction, name) {
-   if (!name.includes('list=RD')) {
-      playSong(client, interaction, name)
-   } else {
-      const listUrl = await getVideoUrls(name)
-      const first = listUrl.shift()
-      playSong(client, interaction, first)
+async function playMusic(client, interaction, name, position) {
+   if (name.includes('&list=RD')) {
+      const urls = await getVideoUrls(name)
+      const first = urls.shift()
+      await playSong(client, interaction, first, position)
 
-      const distube = new DisTubeHandler(client.player)
-      const songs = []
-
-      for (const url of listUrl) {
-         songs.push(await distube.resolve(url))
-      }
-      const list = new Playlist(songs)
-      playSong(client, interaction, list)
+      const songs = await Promise.all(urls.map((url) => client.player.handler.resolve(url)))
+      name = new Playlist({ source: 'youtube', songs: songs })
    }
+   playSong(client, interaction, name, position)
 }
-// #region playSong
-async function songSuggestion(client, query) {
-   // const response = await axios.get('https://www.googleapis.com/youtube/v3/search', {
-   //    params: {
-   //       part: 'snippet',
-   //       maxResults: 10,
-   //       q: query,
-   //       type: 'video',
-   //       videoCategoryId: '10',
-   //       key: client.config.YTAPI,
-   //    },
-   // })
-   // return response.data.items.map((item) => item.snippet.title)
-}
-async function playSong(client, interaction, name) {
+async function playSong(client, interaction, name, position) {
    await client.player
       .play(interaction.member.voice.channel, name, {
+         position,
          member: interaction.member,
          textChannel: interaction.channel,
-         interaction,
       })
-      .catch(() => {})
+      .catch((e) => {
+         console.log(e)
+      })
 }
 async function getVideoUrls(url) {
    try {
       const response = await fetch(url)
       const data = await response.text()
-      const listUrl = []
+      const urls = new Set()
       const regex = /\/watch\?v=([\w-]+)/g
       let match
 
       while ((match = regex.exec(data)) !== null) {
-         const videoId = match[1]
-         const videoUrl = `https://www.youtube.com/watch?v=${videoId}`
-         if (!listUrl.includes(videoUrl)) {
-            listUrl.push(videoUrl)
-         }
+         urls.add(`https://www.youtube.com/watch?v=${match[1]}`)
       }
-      return listUrl
-   } catch (error) {
-      throw error
-   }
+
+      return Array.from(urls)
+   } catch {}
 }
+
+// async function songSuggestion(client, query) {
+//    const response = await require('axios').get('https://www.googleapis.com/youtube/v3/search', {
+//       params: {
+//          part: 'snippet',
+//          maxResults: 10,
+//          q: query,
+//          type: 'video',
+//          videoCategoryId: '10',
+//          key: client.config.YTAPI,
+//       },
+//    })
+//    return response.data.items.map((item) => item.snippet.title)
+// }
 
 // #region Filter
 function description(queue) {
@@ -223,15 +212,16 @@ function getSeconds(str) {
    }
    return totalSeconds
 }
-function getMiliSeconds(str) {
-   return getSeconds(str) * 1000
-}
 
 // #region deleteMessage
 function deleteMessage(message, time) {
-   setTimeout(async () => {
-      if (message) await message.delete().catch(() => {})
-   }, time)
+   try {
+      setTimeout(async () => {
+         if (message) await message.delete()
+      }, time)
+   } catch (e) {
+      console.log('❌  ✦ 🍕 Delete Message Error\n', e)
+   }
 }
 // #region capFirstChar
 function capFirstChar(string) {
@@ -239,28 +229,40 @@ function capFirstChar(string) {
    return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-function formatTime(duration) {
-   if (duration === 'Live') return duration
+function formatTime(seconds, isLive) {
+   if (isLive) return 'Live'
 
-   const parts = duration.split(':').map(Number)
+   const timeUnits = [
+      { unit: 'd', value: 24 * 60 * 60 },
+      { unit: 'h', value: 60 * 60 },
+      { unit: 'm', value: 60 },
+      { unit: 's', value: 1 },
+   ]
 
-   if (parts.length === 3) {
-      return `${parts[0]}h ${parts[1]}m ${parts[2]}s`
-   } else if (parts.length === 2) {
-      if (parts[0] === 0) return `${parts[1]}s`
-      return `${parts[0]}m ${parts[1]}s`
-   } else {
-      return `${parts[0]}s`
-   }
+   let time = timeUnits
+      .reduce((acc, { unit, value }) => {
+         if (seconds >= value) {
+            const amount = Math.floor(seconds / value)
+            seconds %= value
+            acc += `${amount}${unit} `
+         }
+         return acc
+      }, '')
+      .trim()
+
+   return time || '0s'
 }
-// #region updateEmbed
+// #region updateMessage
 async function updateEmbed(interaction, queue) {
    await Promise.all([queue.playerMessage.edit({ embeds: [queue.playerEmbed.setTimestamp()] }), interaction.deferUpdate()]).catch(() => {})
 }
 async function refreshEmbed(queue) {
    try {
       await queue.playerMessage.edit({ embeds: [queue.playerEmbed.setTimestamp()] })
-   } catch { }
+   } catch {}
+}
+async function updateButtons(queue) {
+   await queue.playerMessage.edit({ components: queue.actionRows })
 }
 
 // #region Queue
@@ -269,9 +271,9 @@ function generateQueuePage(client, queue, start, page, total, pageLength, songLi
    const current = songList.slice(start, start + pageLength)
    return new EmbedBuilder()
       .setColor(client.config.player.embedColor)
-      .setAuthor({ name: '─────・ P L A Y  L I S T 🌱・─────', iconURL: queue.textChannel.guild.iconURL() })
-      .setDescription(current.map((song) => `\n${index++}. [${song.name}](${song.url})・${formatTime(song.duration)}`).join(''))
-      .setFooter({ text: `💽 • Page ${page} / ${total}` })
+      .setAuthor({ name: '✦ ───── ───── ✦  P L A Y  L I S T 🪐 ✦ ───── ───── ✦', iconURL: queue.textChannel.guild.iconURL() })
+      .setDescription(current.map((song) => `\n${index++}. [${song.name}](${song.url})・${formatTime(song.duration, song.isLive)}`).join(''))
+      .setFooter({ text: `🥪 • Page ${page} / ${total}` })
 }
 function queueActionRow(page, total) {
    return new ActionRowBuilder().addComponents(
@@ -285,25 +287,12 @@ function queueActionRow(page, total) {
 
 // #region showModal
 async function showModal(interaction, customId, title, inputId, label, placeholder) {
-   const modal = new ModalBuilder().setCustomId(customId).setTitle(title)
-
    const textInput = new TextInputBuilder().setCustomId(inputId).setLabel(label).setStyle('Short').setPlaceholder(placeholder)
-
-   modal.addComponents(new ActionRowBuilder().addComponents(textInput))
+   const modal = new ModalBuilder().setCustomId(customId).setTitle(title).addComponents(new ActionRowBuilder().addComponents(textInput))
    await interaction.showModal(modal)
 }
 
-function getGuilds(client) {
-   const guildNames = client.guilds.cache.map((guild) => guild.name).join('\n')
-   fs.writeFile('guilds.txt', guildNames, (error) => {
-      if (error) {
-         console.log('Error writing to file:', error)
-      } else {
-         console.log('Guild names have been written to guilds.txt')
-      }
-   })
-}
-
+//
 function generateGuildName() {
    return `B-${Math.floor(100000 + Math.random() * 900000)}`
 }
@@ -328,9 +317,7 @@ async function createGuild(token) {
          body: JSON.stringify(data),
       })
 
-      if (!response.ok) {
-         return 'Failed to create server'
-      }
+      if (!response.ok) return 'Failed to create server'
 
       const guildData = await response.json()
       return `Created server: ID: ${guildData.id} | Name: ${serverName}`
@@ -363,9 +350,9 @@ async function sleep(ms) {
 }
 
 function printData(data) {
-   console.log('---------------------------------------------')
+   console.log('✦ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ✦')
    console.log(data)
-   console.log('---------------------------------------------')
+   console.log('✦ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ✦')
 }
 
 

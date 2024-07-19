@@ -44,7 +44,7 @@ module.exports = {
 
          deleteMessage(await interaction.editReply({ embeds: [embed] }), 10000)
       } catch {
-         console.log('❌    Skip Error')
+         console.log('❌  ✦ Skip Error')
       }
    }
 }

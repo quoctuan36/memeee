@@ -5,7 +5,7 @@
 
 Before you begin, make sure you have the following installed:
 
-- **[Node.js](https://nodejs.org/en/)** `Version 18.20.2`
+- **[Node.js](https://nodejs.org/en/)** `Version 18`
 - **[FFMPEG](https://www.ffmpeg.org/)** `Lastest`
 
 

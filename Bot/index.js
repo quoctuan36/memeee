@@ -1,30 +1,24 @@
-const { Client, GatewayIntentBits } = require('discord.js')
-const { YtDlpPlugin } = require('@distube/yt-dlp')
+const { Client, GatewayIntentBits, Collection, Events } = require('discord.js')
+const { YouTubePlugin } = require('@distube/youtube')
+const { SpotifyPlugin } = require('@distube/spotify')
+const { SoundCloudPlugin } = require('@distube/soundcloud')
 const { DisTube } = require('distube')
-
-const init = require('./init')
-const login = require('./login')
-const server = require('./server')
 
 module.exports = class MeowBot {
    constructor(config) {
-      this.client = new Client({
-         intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates]
-      })
+      this.client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] })
 
       this.client.config = config
-      this.client.player = new DisTube(this.client, {
-         plugins: [new YtDlpPlugin()],
-         leaveOnStop: config.leave,
-         leaveOnFinish: config.leave,
-         leaveOnEmpty: config.leave,
-      })
+      this.client.player = new DisTube(this.client, { plugins: [new YouTubePlugin(), new SpotifyPlugin(), new SoundCloudPlugin()] })
+      this.client.buttons = new Collection()
+      this.client.commands = new Collection()
+      this.client.interface = []
 
-      init(this.client)
-      login(this.client)
-      server()
+      require('./init')(this.client)
+      require('./login')(this.client)
    }
 }
+
 
 
 

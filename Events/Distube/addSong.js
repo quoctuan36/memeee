@@ -1,12 +1,11 @@
-const { EmbedBuilder } = require('discord.js')
+const { getAddEmbed } = require('../../Functions')
 
 module.exports = async (client, queue, song) => {
-   const embed = new EmbedBuilder()
-      .setColor(client.config.player.embedColor)
-      .setThumbnail(song.thumbnail)
-      .setDescription(`Added [${song.name}](${song.url})・Requested by <@${song.user.id}>`)
-
-   queue.textChannel.send({ embeds: [embed] }).catch(() => {})
+   try {
+      queue.textChannel.send({ embeds: [getAddEmbed(client, song)] }).catch(() => {})
+   } catch {
+      console.log('❌  ✦ 🥝 AddSong Error')
+   }
 }
 
 

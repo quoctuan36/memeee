@@ -1,20 +1,27 @@
-const { REST } = require('@discordjs/rest')
-const { Routes } = require('discord-api-types/v10')
+const { Routes, ActionRowBuilder, ButtonBuilder, EmbedBuilder } = require('discord.js')
 
 module.exports = async (client) => {
-   const rest = new REST({ version: '10' }).setToken(client.config.TOKEN)
+   console.log('\x1b[31m%s\x1b[0m', '✔️   ✦ 💖 From Pooba Saga With Luv')
+   console.log('\x1b[32m%s\x1b[0m', '✔️   ✦ 🍕 Logged in as -- ' + client.user.username)
 
-   try {
-      await rest.put(Routes.applicationCommands(client.user.id), { body: await client.interface })
-      console.log('\x1b[35m%s\x1b[0m', `✔️    🌑 ⬪ Commands Loaded`)
-   } catch {
-      console.log('\x1b[35m%s\x1b[0m', `❌    🌑 ⬪ Commands Distracted`)
-   }
-   console.log('\x1b[31m%s\x1b[0m', `✔️    💖 ⬪ From Pooba Saga With Luv`)
-   console.log('\x1b[32m%s\x1b[0m', `✔️    🐸 ⬪ Logged in as -- ${client.user.username}`)
+   await client.rest.put(Routes.applicationCommands(client.user.id), { body: client.interface })
 
-   process.env.YTDL_NO_UPDATE = true
-   process.env.YTSR_NO_UPDATE = true
+   client.greeting = [
+      new EmbedBuilder()
+         .setColor(client.config.player.embedColor)
+         .setThumbnail(client.config.player.embedGif)
+         .setDescription(
+            '✦ Wish you a happy music time, moah moah\n' +
+            '✦ Click buttons below for more info\n' +
+            '✦ From Pooba Saga with luv\n' +
+            '✦ ' + client.user.username + ' :3'
+         ),
+
+      new ActionRowBuilder().addComponents(
+         new ButtonBuilder({ label: 'Invite Me', style: 5 }).setURL(client.config.invite.inviteUrl).setDisabled(!client.config.invite.inviteStatus),
+         new ButtonBuilder({ label: 'Join Server', style: 5 }).setURL(client.config.invite.inviteGuild)
+      ),
+   ]
 }
 
 

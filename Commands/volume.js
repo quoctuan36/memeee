@@ -3,7 +3,7 @@ const { deleteMessage } = require('../Functions')
 
 module.exports = {
    name: 'volume',
-   description: 'Adjust volume',
+   description: 'Adjust the volume of the music',
    voiceChannel: true,
    options: [
       {
@@ -16,11 +16,11 @@ module.exports = {
    ],
 
    suggest: async (interaction) => {
-      const query = Number(interaction.options.getFocused())
+      const query = interaction.options.getFocused()
       const choices = [1, 50, 100]
 
       const filtered = choices.filter((choice) => choice >= query)
-      const response = filtered.map((choice) => ({ name: choice.toString(), value: choice }))
+      const response = filtered.map((choice) => ({ name: choice, value: choice }))
 
       await interaction.respond(response)
    },
@@ -46,7 +46,7 @@ module.exports = {
 
          deleteMessage(await interaction.editReply({ embeds: [embed] }), 10000)
       } catch {
-         console.log('❌    Set Volume Error')
+         console.log('❌  ✦ Set Volume Error')
       }
    }
 }

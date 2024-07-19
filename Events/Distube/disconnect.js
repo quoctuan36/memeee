@@ -1,7 +1,9 @@
 module.exports = async (client, queue) => {
-   if (queue.playerMessage) {
-      await queue.playerMessage.delete().catch(() => {})
-      await queue.stop()
+   try {
+      if (queue.playerMessage) await queue.playerMessage.delete().catch(() => {})
+      if (queue) await queue.stop()
+   } catch {
+      console.log('❌  ✦ 🥝 Disconnect Error')
    }
 }
 

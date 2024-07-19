@@ -8,4 +8,4 @@
 
 ## Reporting a Vulnerability
 
-If you encounter any issues, please go to [Discord](https://discord.gg/fTuGFk9ayG) :3
+If you encounter any issue, please go to [Discord](https://discord.gg/fTuGFk9ayG) :3
