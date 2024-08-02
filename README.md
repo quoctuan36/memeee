@@ -5,7 +5,7 @@
 
 Before you begin, make sure you have the following installed:
 
-- **[Node.js](https://nodejs.org/en/)** `Version 18`
+- **[Node.js](https://nodejs.org/en/)** `Version 18 or 20`
 - **[FFMPEG](https://www.ffmpeg.org/)** `Lastest`
 
 
@@ -28,16 +28,6 @@ Before you begin, make sure you have the following installed:
     ```bash
     npm i
     ```
-
-
-## Bot Permissions
-
-To ensure MeowBot works properly, set the following permissions:
-
-- **Application Scope** Enable `applications.commands` `bot` in the **OAuth2** tab on [Dev Portal](https://discord.com/developers/applications/).
-
-- **Intents** Enable `PRESENCE INTENT` `SERVER MEMBERS INTENT` `MESSAGE CONTENT INTENT` in the **Bot** tab on [Dev Portal](https://discord.com/developers/applications/).
-
 
 ## Configuration
 
@@ -100,9 +90,8 @@ node index.js
 
 ## Support
 
-> Contact me [ryohuy2410](https://discord.gg/fTuGFk9ayG) for any issue.
+> Contact me [ryohuy2410](https://discord.gg/fTuGFk9ayG).
 
 ## Credits
 
 > If you consider using this Bot, make sure to credit me ><.
-> Example: `From [ryohuy2410](https://discord.gg/fTuGFk9ayG) with luv, meowed by [modifier/your Name](<url>)` :3.
